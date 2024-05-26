@@ -113,10 +113,14 @@ def show_developer_info():
     st.sidebar.text("College: REC Bijnor (B.Tech IT)")
 
 def main():
+    # Developer Information
+    st.title("Developer Information")
+    st.write("Developer Name: Satwik Tiwari")
+    st.write("Address: Prayagraj")
+    st.write("College: REC Bijnor (B.Tech IT)")
+    
     st.sidebar.title("Navigation")
     page = st.sidebar.radio("Go to", ["Upload & Preprocess", "Visualization", "Model Training", "Predict"])
-
-    show_developer_info()
 
     if page == "Upload & Preprocess":
         st.title("Upload & Preprocess CSV Data")
@@ -161,16 +165,16 @@ def main():
             label_encoder = st.session_state.get("label_encoder", None)
             user_input = {}
             for col in input_columns:
-                                user_input[col] = st.text_input(f"Input {col}")
+                user_input[col] = st.text_input(f"Input {col}")
             if st.button("Predict"):
+                user_input_df = pd.DataFrame([user_input])
+                user_input_df, _ = encode_data(user_input_df)
+                prediction = model.predict(user_input_df)
                 if label_encoder:
-                    for col, encoder in label_encoder.items():
-                        user_input[col] = encoder.transform([user_input[col]])[0]
-                input_data = pd.DataFrame([user_input], columns=input_columns)
-                prediction = model.predict(input_data)[0]
-                st.write("## Prediction")
-                st.write(prediction)
+                    prediction = label_encoder.inverse_transform(prediction)
+                st.write(f"Prediction: {prediction}")
+        else:
+            st.error("Please train a model first in the 'Model Training' page.")
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     main()
-
